@@ -76,7 +76,7 @@ func CreateChar(c *fiber.Ctx) error {
 func CreateCharacters(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var payload struct {
-		Results []models.Character `json: "results"`
+		Results []models.Character `json:"results"`
 	}
 	defer cancel()
 
