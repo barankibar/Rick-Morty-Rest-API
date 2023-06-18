@@ -55,6 +55,11 @@ func CreateUser(c *fiber.Ctx) error {
 		Password: user.Password,
 	}
 
+	err := userCollection.FindOne(ctx, bson.D{primitive.E{Key: "username", Value: user.UserName}}).Decode(&user)
+	if err == nil {
+		return c.Status(http.StatusBadRequest).JSON(responses.UserResponse{Status: http.StatusBadRequest, Message: "Error : Username must be unique", Data: &fiber.Map{"data": "username must be unique"}})
+	}
+
 	result, err := userCollection.InsertOne(ctx, newUser)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(responses.UserResponse{Status: http.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": err.Error()}})
