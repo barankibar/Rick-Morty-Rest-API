@@ -10,11 +10,29 @@ func main() {
 	app := fiber.New()
 
 	configs.ConnectDB()
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(&fiber.Map{"data": "Hello from Fiber & mongoDB"})
+
+	app.Static("/", "./static", fiber.Static{
+		Compress: true,
+		Browse:   true,
+		MaxAge:   3600,
+		Index:    "index.html",
+	})
+	app.Static("/login", "./static", fiber.Static{
+		Compress: true,
+		Browse:   true,
+		MaxAge:   3600,
+		Index:    "login.html",
+	})
+	app.Static("/register", "./static", fiber.Static{
+		Compress: true,
+		Browse:   true,
+		MaxAge:   3600,
+		Index:    "register.html",
 	})
 
-	routes.CharRoutes(app)
+	routes.UserRoutes(app)
+	routes.ApiRoutes(app)
+	routes.JwtRoutes(app)
 
-	app.Listen(":6000")
+	app.Listen(":3000")
 }

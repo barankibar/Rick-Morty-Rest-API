@@ -16,3 +16,12 @@ func EnvMongoURI() string {
 
 	return os.Getenv("MONGODB_URI")
 }
+
+func EnvJWTSecret() []byte {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Secret can't obtained")
+	}
+
+	return []byte(os.Getenv("JWT_SECRET"))
+}

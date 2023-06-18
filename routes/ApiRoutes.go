@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func CharRoutes(app *fiber.App) {
+func ApiRoutes(app *fiber.App) {
 	app.Post("/api/create/character", controllers.CreateChar)
 	app.Post("/api/characters", controllers.CreateCharacters)
 
