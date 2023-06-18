@@ -20,7 +20,7 @@ var validate = validator.New()
 
 func GetACharacter(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	charID := c.Params("charID")
+	charID := c.Params("id")
 
 	var character models.Character
 

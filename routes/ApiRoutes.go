@@ -6,8 +6,8 @@ import (
 )
 
 func ApiRoutes(app *fiber.App) {
-	app.Post("/api/create/character", controllers.CreateChar)
-	app.Post("/api/characters", controllers.CreateCharacters)
+	app.Post("/api/v1/create/character", controllers.CreateChar)
+	app.Post("/api/v1/characters", controllers.CreateCharacters)
 
-	app.Get("/api/user/:userId", controllers.GetACharacter)
+	app.Get("/api/character/:id", controllers.GetACharacter)
 }
