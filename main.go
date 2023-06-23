@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/barankibar/Rick-Morty-Rest-API/routes/configs"
+	"github.com/barankibar/Rick-Morty-Rest-API/routes/middlewares"
 	"github.com/barankibar/Rick-Morty-Rest-API/routes/routes"
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,6 +11,8 @@ func main() {
 	app := fiber.New()
 
 	configs.ConnectDB()
+
+	middlewares.JWTProtected()
 
 	app.Static("/", "./static", fiber.Static{
 		Compress: true,
@@ -30,9 +33,11 @@ func main() {
 		Index:    "register.html",
 	})
 
+	// Public Routes
 	routes.UserRoutes(app)
+
+	// Private Routes
 	routes.ApiRoutes(app)
-	routes.JwtRoutes(app)
 
 	app.Listen(":3000")
 }

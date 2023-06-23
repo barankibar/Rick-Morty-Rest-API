@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/barankibar/Rick-Morty-Rest-API/routes/configs"
+	"github.com/barankibar/Rick-Morty-Rest-API/routes/handlers"
 	"github.com/barankibar/Rick-Morty-Rest-API/routes/models"
 	"github.com/barankibar/Rick-Morty-Rest-API/routes/responses"
 	"github.com/gofiber/fiber/v2"
@@ -32,7 +33,12 @@ func UserLogin(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(responses.CharResponse{Status: http.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": err.Error()}})
 	}
 
-	return c.Status(http.StatusOK).JSON(responses.CharResponse{Status: http.StatusOK, Message: "OK", Data: &fiber.Map{"data": user}})
+	t, err := handlers.HandleGenerateToken(*user)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(responses.JWTCreatedResponse{Message: "Error", Status: http.StatusInternalServerError, Data: &fiber.Map{"Error": err.Error()}})
+	}
+
+	return c.Status(http.StatusOK).JSON(responses.JWTCreatedResponse{Message: "JWT Created", Status: http.StatusOK, Data: &fiber.Map{"access_token": t}, Algorithm: "HS256", Type: "JWT"})
 }
 
 func CreateUser(c *fiber.Ctx) error {
