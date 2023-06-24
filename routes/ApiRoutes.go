@@ -12,5 +12,6 @@ func ApiRoutes(app *fiber.App) {
 	api.Post("/create/character", controllers.CreateChar)
 	api.Post("/characters", controllers.CreateCharacters)
 
-	api.Get("/character/:id", controllers.GetACharacter)
+	api.Get("/character/id/:id", controllers.GetACharacter)
+	api.Get("/characters/:count", controllers.GetMultCharacters)
 }

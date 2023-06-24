@@ -13,10 +13,49 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var charCollection *mongo.Collection = configs.GetCollection(configs.DB, "characters")
 var validate = validator.New()
+
+func GetMultCharacters(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	var characters []models.Character
+
+	defer cancel()
+
+	count, err := c.ParamsInt("count")
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(responses.CharResponse{Message: "Missing Parameter", Status: http.StatusBadRequest, Data: &fiber.Map{"data": err.Error()}})
+	}
+
+	findOptions := options.Find().SetLimit(int64(count))
+
+	cursor, err := charCollection.Find(ctx, bson.D{{}}, findOptions)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(responses.CharResponse{Message: "Error", Status: http.StatusInternalServerError, Data: &fiber.Map{"data": err.Error()}})
+	}
+
+	for cursor.Next(context.Background()) {
+		var char models.Character
+
+		err := cursor.Decode(&char)
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).JSON(responses.CharResponse{Message: "Error", Status: http.StatusInternalServerError, Data: &fiber.Map{"data": err.Error()}})
+		}
+
+		characters = append(characters, char)
+	}
+
+	return c.Status(http.StatusOK).JSON(responses.CharResponse{
+		Status:  http.StatusOK,
+		Message: "Data",
+		Data: &fiber.Map{
+			"data": characters,
+		},
+	})
+}
 
 func GetACharacter(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
