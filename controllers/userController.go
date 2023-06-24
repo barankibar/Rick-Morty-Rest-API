@@ -21,16 +21,21 @@ func UserLogin(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	user := new(models.User)
+	body := new(models.User)
 
-	if err := c.BodyParser(user); err != nil {
+	if err := c.BodyParser(body); err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
 			"errors": err.Error(),
 		})
 	}
 
-	err := userCollection.FindOne(ctx, bson.D{primitive.E{Key: "username", Value: user.UserName}}).Decode(&user)
+	err := userCollection.FindOne(ctx, bson.D{primitive.E{Key: "username", Value: body.UserName}}).Decode(&user)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(responses.CharResponse{Status: http.StatusInternalServerError, Message: "Error", Data: &fiber.Map{"data": err.Error()}})
+	}
+
+	if body.Password != user.Password {
+		return c.Status(http.StatusUnauthorized).JSON(responses.UserResponse{Message: "Error", Status: http.StatusUnauthorized, Data: &fiber.Map{"data": "Invalid Password"}})
 	}
 
 	t, err := handlers.HandleGenerateToken(*user)
